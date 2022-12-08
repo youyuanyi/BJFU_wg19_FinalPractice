@@ -493,7 +493,6 @@ const updateNode = async (node) => {
 
 const toUpdate = async () => {
     formRef.value?.validate((errors) => {
-        console.log(errors)
         if (errors) {
             message.error("数据格式有误")
         } else {

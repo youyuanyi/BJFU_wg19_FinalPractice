@@ -230,7 +230,7 @@
                                                         <td>{{ phy.conversion }}</td>
                                                         <td v-if="(user.role == 0)">
                                                             <n-space>
-                                                                <n-button @click="updateNode(node)" type="primary">
+                                                                <n-button @click="updatePhy(phy)" type="primary">
                                                                     <template #icon><n-icon>
                                                                             <CreateOutline />
                                                                         </n-icon></template>
@@ -248,7 +248,33 @@
                                         </div>
                                     </div>
                                 </div>
+                                <n-modal v-model:show="showUpdateModel" preset="dialog" title="Dialog">
+                                    <template #header>
+                                        <div>修改</div>
+                                    </template>
+                                    <n-form ref="formRef" :model="upPhy">
+                                        <n-form-item label="物理量编号" style="margin-top: 20px;">
+                                            <n-input v-model:value="upPhy.id" :disabled="!active" />
+                                        </n-form-item>
+                                        <n-form-item label="物理量名">
+                                            <n-input v-model:value="upPhy.physicalName" placeholder="物理量名" clearable />
+                                        </n-form-item>
+                                        <n-form-item label="物理意义">
+                                            <n-input v-model:value="upPhy.meaning" size="large" round
+                                                placeholder="物理意义" />
+                                        </n-form-item>
+                                        <n-form-item label="换算方式" path="duration">
+                                            <n-input v-model:value="upPhy.conversion" size="large" round
+                                                placeholder="换算方式" />
+                                        </n-form-item>
 
+                                        <n-form-item label="">
+                                            <n-button @click="closeModal">取消</n-button>
+                                            <n-button @click="toUpdate" type="success"
+                                                style="margin-left: 20px;">确认</n-button>
+                                        </n-form-item>
+                                    </n-form>
+                                </n-modal>
                                 <div class="vspace-sm"></div>
 
 
@@ -280,7 +306,7 @@ import { Search } from '@vicons/ionicons5'
 import InjectToken from '../components/InjectToken.vue'
 import { AddCircleOutline, RefreshCircleOutline, SearchOutline, TrashOutline, CreateOutline, DownloadOutline } from "@vicons/ionicons5"
 import { useRouter, useRoute } from 'vue-router'
-import { eq } from 'lodash'
+import { eq, upperCase } from 'lodash'
 const router = useRouter()
 const route = useRoute()
 
@@ -289,7 +315,7 @@ const axios = inject("axios")
 const message = inject("message")
 const dialog = inject("dialog")
 
-const showModal = ref(false)
+const showUpdateModel = ref(false)
 
 const user = reactive({
     avatarUrl: "",
@@ -328,12 +354,49 @@ const loadUserInfo = async () => {
         user.name = res.data.data.name
     }
 }
+const upPhy = reactive({
+    id: "",
+    physicalName: "",
+    meaning: "",
+    conversion: "",
+})
 
-
+const updatePhy = async (phy) => {
+    showUpdateModel.value = true
+    upPhy.id = phy.id
+    upPhy.physicalName = phy.physicalName
+    upPhy.meaning = phy.meaning
+    upPhy.conversion = phy.conversion
+}
+const toUpdate = async () => {
+    formRef.value?.validate((errors) => {
+        if (errors) {
+            message.error("数据格式有误")
+        } else {
+            update();
+        }
+    })
+}
+const update = async () => {
+    let res = await axios.put("phy/" + upPhy.id, {
+        physicalName: upPhy.physicalName,
+        meaning: upPhy.meaning,
+        conversion: upPhy.conversion,
+    })
+    console.log("res:", res)
+    if (res.data.code == 200) {
+        message.success(res.data.msg)
+        loadAllPhy()
+        loadUserInfo()
+        closeModal()
+    } else {
+        message.error(res.data.msg)
+    }
+}
 
 
 const closeModal = () => {
-    showModal.value = false;
+    showUpdateModel.value = false;
 }
 
 function ChangeRoute(dir) {
