@@ -144,10 +144,10 @@
 
                         </li>
                         <li>
-                            <a href="/index">
+                            <a @click="ChangeRoute('/DataManage')">
                                 <i class="glyphicon glyphicon-globe"></i>
                                 数据展示
-                                <span class="label label-warning pull-right">5</span>
+
                             </a>
                         </li>
                     </ul>

@@ -188,7 +188,7 @@
                             <h1>
                                 <small>
                                     <i class="icon-double-angle-right"></i>
-                                    物理量操作
+                                    数据展示
                                 </small>
                             </h1>
 
@@ -203,78 +203,95 @@
                                 <div class="row">
 
                                     <div class="col-xs-12">
+                                        <div style="display: flex; margin-top: 10px;">
+                                            <n-tag type="success">
+                                                节点
+                                            </n-tag>
+                                            <n-select v-model:value="pageInfo.nodeID" :options="equipOptions"
+                                                style="width: 300px; margin-left:5px;margin-right:20px;" filterable />
+                                            <n-tag type="success">
+                                                数据种类
+                                            </n-tag>
+                                            <n-select v-model:value="pageInfo.dataName" :options="dataOptions"
+                                                style="width: 300px; margin-left:5px;margin-right: 20px;" filterable />
 
+                                            <n-tag type="success">
+                                                时间段
+                                            </n-tag>
+                                            <n-date-picker style="width: 300px; margin-left:5px;margin-right: 20px;"
+                                                v-model:formatted-value="pageInfo.time"
+                                                value-format="yyyy-MM-dd HH:mm:ss" type="datetimerange" clearable />
+                                            <n-button @click="search" type="success" style="margin-left: 20px;">
+                                                <template #icon><n-icon>
+                                                        <SearchOutline />
+                                                    </n-icon></template>
+                                                查询&#8194;
+                                            </n-button>
+                                        </div>
                                         <div style="display: flex; ">
                                             <n-table :bordered="true" :single-line="false" style="margin-top:20px;">
                                                 <thead>
                                                     <tr>
 
-                                                        <th class="hidden-480">物理量编号</th>
-                                                        <th class="hidden-480">物理量名</th>
-                                                        <th>物理意义</th>
-                                                        <th>换算方式</th>
+                                                        <th class="hidden-480">数据编号</th>
+                                                        <th class="hidden-480">区域</th>
+                                                        <th>设备节点</th>
+                                                        <th>时间</th>
+                                                        <th>温度</th>
+                                                        <th>湿度</th>
+                                                        <th>降雨量</th>
+                                                        <th>海拔</th>
+                                                        <th>PM2.5</th>
+                                                        <th>风向</th>
+                                                        <th>风速</th>
+                                                        <th>PM10</th>
+                                                        <th>压强</th>
                                                         <th v-if="(user.role == 0)">操作</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
 
-                                                    <tr v-for="(phy, index) in phyList">
-
+                                                    <tr v-for="(data, index) in dataList">
+                                                        <td>{{ data.id }}</td>
+                                                        <td>{{ data.area_id }}</td>
+                                                        <td>{{ data.node_id }}</td>
+                                                        <td>{{ data.date }}</td>
+                                                        <td>{{ data.temperature }}</td>
+                                                        <td>{{ data.humidity }}</td>
+                                                        <td>{{ data.rainfall }}</td>
+                                                        <td>{{ data.altitude }}</td>
+                                                        <td>{{ data.pm2dot5 }}</td>
+                                                        <td>{{ data.windDirection }}</td>
+                                                        <td>{{ data.windSpeed }}</td>
+                                                        <td>{{ data.pm10 }}</td>
+                                                        <td>{{ data.pressure }}</td>
                                                         <td>
-                                                            {{ phy.id }}
+                                                            <n-button @click="updateValue(school)">
+                                                                <template #icon><n-icon>
+                                                                        <CreateOutline />
+                                                                    </n-icon></template>
+                                                                修改&#8194;
+                                                            </n-button>
+                                                            <n-button @click="toDelete(school)"
+                                                                style="margin-left:20px;">
+                                                                <template #icon><n-icon>
+                                                                        <TrashOutline />
+                                                                    </n-icon></template>
+                                                                删除&#8194;
+                                                            </n-button>
                                                         </td>
-                                                        <td class="hidden-480">{{ phy.physicalName }}</td>
-                                                        <td class="hidden-480">
-                                                            {{ phy.meaning }}
-                                                        </td>
-                                                        <td>{{ phy.conversion }}</td>
-                                                        <td v-if="(user.role == 0)">
-                                                            <n-space>
-                                                                <n-button @click="updatePhy(phy)" type="primary">
-                                                                    <template #icon><n-icon>
-                                                                            <CreateOutline />
-                                                                        </n-icon></template>
-                                                                    编辑
-                                                                </n-button>
-                                                            </n-space>
-                                                        </td>
-
                                                     </tr>
-
 
                                                 </tbody>
                                             </n-table>
+
                                             <br />
                                         </div>
+                                        <n-pagination @update:page="loadUserInfo" v-model:page="pageInfo.pageNum"
+                                            :page-count="pageInfo.pageCount" style="margin-top: 20px;" />
                                     </div>
                                 </div>
-                                <n-modal v-model:show="showUpdateModel" preset="dialog" title="Dialog">
-                                    <template #header>
-                                        <div>修改</div>
-                                    </template>
-                                    <n-form ref="formRef" :model="upPhy">
-                                        <n-form-item label="物理量编号" style="margin-top: 20px;">
-                                            <n-input v-model:value="upPhy.id" :disabled="!active" />
-                                        </n-form-item>
-                                        <n-form-item label="物理量名">
-                                            <n-input v-model:value="upPhy.physicalName" placeholder="物理量名" clearable />
-                                        </n-form-item>
-                                        <n-form-item label="物理意义">
-                                            <n-input v-model:value="upPhy.meaning" size="large" round
-                                                placeholder="物理意义" />
-                                        </n-form-item>
-                                        <n-form-item label="换算方式" path="duration">
-                                            <n-input v-model:value="upPhy.conversion" size="large" round
-                                                placeholder="换算方式" />
-                                        </n-form-item>
 
-                                        <n-form-item label="">
-                                            <n-button @click="closeModal">取消</n-button>
-                                            <n-button @click="toUpdate" type="success"
-                                                style="margin-left: 20px;">确认</n-button>
-                                        </n-form-item>
-                                    </n-form>
-                                </n-modal>
                                 <div class="vspace-sm"></div>
 
 
@@ -306,7 +323,7 @@ import { Search } from '@vicons/ionicons5'
 import InjectToken from '../components/InjectToken.vue'
 import { AddCircleOutline, RefreshCircleOutline, SearchOutline, TrashOutline, CreateOutline, DownloadOutline } from "@vicons/ionicons5"
 import { useRouter, useRoute } from 'vue-router'
-import { eq, upperCase } from 'lodash'
+import { eq, flatMap, upperCase } from 'lodash'
 const router = useRouter()
 const route = useRoute()
 
@@ -331,20 +348,30 @@ const bodyStyle = {
 }
 
 
+
+const equipOptions = ref([])
+const dataOptions = ref([])
+const dataList = ref([])
+const pageInfo = reactive({
+    pageNum: 1,
+    pageSize: 6,
+    pageCount: 0,
+    count: 0,
+    nodeID: "",
+    dataName: "",
+    time: ""
+})
+
+
 // 页面加载时就执行
 onMounted(() => {
     loadUserInfo()
-    loadAllPhy()
 })
 
-const phyList = ref([])
-const loadAllPhy = async () => {
-    let res = await axios.get("/phy")
-    if (res.data.code == 200) {
-        phyList.value = res.data.data.phyList
-    }
+const search = () => {
+    pageInfo.pageNum = 1
+    loadUserInfo()
 }
-
 const loadUserInfo = async () => {
     let res = await axios.get("/user")
     console.log(res)
@@ -352,48 +379,37 @@ const loadUserInfo = async () => {
         user.id = res.data.data.id
         user.role = res.data.data.role
         user.name = res.data.data.name
+        loadData(0, user.id)
     }
 }
-const upPhy = reactive({
-    id: "",
-    physicalName: "",
-    meaning: "",
-    conversion: "",
-})
-
-const updatePhy = async (phy) => {
-    showUpdateModel.value = true
-    upPhy.id = phy.id
-    upPhy.physicalName = phy.physicalName
-    upPhy.meaning = phy.meaning
-    upPhy.conversion = phy.conversion
-}
-const toUpdate = async () => {
-    formRef.value?.validate((errors) => {
-        if (errors) {
-            message.error("数据格式有误")
-        } else {
-            update();
-        }
-    })
-}
-const update = async () => {
-    let res = await axios.put("phy/" + upPhy.id, {
-        physicalName: upPhy.physicalName,
-        meaning: upPhy.meaning,
-        conversion: upPhy.conversion,
-    })
-    console.log("res:", res)
+const loadData = async (pageNum = 0, id) => {
+    if (pageNum != 0) {
+        pageInfo.pageNum = pageNum;
+    }
+    var nodeID = new Number(pageInfo.nodeID)
+    let res = await axios.post(`/data/${id}?dataName=${pageInfo.dataName}&nodeID=${nodeID}&time=${pageInfo.time}&pageNum=${pageInfo.pageNum}&pageSize=${pageInfo.pageSize}`)
+    console.log("res", res)
     if (res.data.code == 200) {
-        message.success(res.data.msg)
-        loadAllPhy()
-        loadUserInfo()
-        closeModal()
+        dataList.value = res.data.data.dataList
+        equipOptions.value = res.data.data.equipList.map((item) => {
+            return {
+                label: item.nodeName,
+                value: item.id,
+            }
+        })
+        dataOptions.value = res.data.data.phyList.map((item) => {
+            return {
+                label: item.chinese_name,
+                value: item.physicalName,
+            }
+        })
     } else {
+        console.log(res.data.code)
         message.error(res.data.msg)
     }
+    pageInfo.count = res.data.data.count;
+    pageInfo.pageCount = parseInt(pageInfo.count / pageInfo.pageSize) + (pageInfo.count % pageInfo.pageSize > 0 ? 1 : 0)
 }
-
 
 const closeModal = () => {
     showUpdateModel.value = false;

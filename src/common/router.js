@@ -8,6 +8,7 @@ let routes = [
     { path: "/UserManage", component: () => import("../views/UserManage.vue") },
     { path: "/NodeManage", component: () => import("../views/NodeManage.vue") },
     { path: "/PhysicalManage", component: () => import("../views/PhysicalManage.vue") },
+    { path: "/DataManage", component: () => import("../views/DataManage.vue") },
     { path: "/test",component: () => import("../views/test.vue")}
 ]
 
