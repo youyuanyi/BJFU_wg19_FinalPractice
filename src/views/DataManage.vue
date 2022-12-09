@@ -256,7 +256,7 @@
                                                         <td>{{ data.area_id }}</td>
                                                         <td>{{ data.node_id }}</td>
                                                         <td>{{ data.date }}</td>
-                                                        <td v-if="data.temperature != '0'">{{ data.temperature }}</td>
+                                                        <td>{{ data.temperature }}</td>
                                                         <td>{{ data.humidity }}</td>
                                                         <td>{{ data.rainfall }}</td>
                                                         <td>{{ data.altitude }}</td>
