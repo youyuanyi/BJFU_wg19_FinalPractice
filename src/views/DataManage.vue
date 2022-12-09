@@ -256,7 +256,7 @@
                                                         <td>{{ data.area_id }}</td>
                                                         <td>{{ data.node_id }}</td>
                                                         <td>{{ data.date }}</td>
-                                                        <td>{{ data.temperature }}</td>
+                                                        <td v-if="data.temperature != '0'">{{ data.temperature }}</td>
                                                         <td>{{ data.humidity }}</td>
                                                         <td>{{ data.rainfall }}</td>
                                                         <td>{{ data.altitude }}</td>
@@ -391,7 +391,7 @@ const loadData = async (pageNum = 0, id) => {
     console.log("res", res)
     if (res.data.code == 200) {
         dataList.value = res.data.data.dataList
-        equipOptions.value = res.data.data.equipList.map((item) => {
+        equipOptions.value = res.data.data.equipListAll.map((item) => {
             return {
                 label: item.nodeName,
                 value: item.id,
