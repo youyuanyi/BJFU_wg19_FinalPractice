@@ -9,6 +9,8 @@ let routes = [
     { path: "/NodeManage", component: () => import("../views/NodeManage.vue") },
     { path: "/PhysicalManage", component: () => import("../views/PhysicalManage.vue") },
     { path: "/DataManage", component: () => import("../views/DataManage.vue") },
+    { path: "/BarManage", component: () => import("../views/BarManage.vue") },
+    { path: "/LineManage", component: () => import("../views/LineManage.vue") },
     { path: "/test",component: () => import("../views/test.vue")}
 ]
 

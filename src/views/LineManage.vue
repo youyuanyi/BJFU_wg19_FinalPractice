@@ -184,14 +184,20 @@
                     </div>
 
                     <div class="page-content">
+                        <div class="page-header">
+                            <h1>
+                                <small>
+                                    <i class="icon-double-angle-right"></i>
+                                    折线图
+                                </small>
+                            </h1>
+                        </div><!-- /.page-header -->
+
                         <div class="row">
                             <div class="col-xs-12">
                                 <!-- PAGE CONTENT BEGINS -->
                                 <div class="row">
-
                                     <div class="col-xs-12">
-
-
                                         <div style="display: flex; margin-top: 10px;">
                                             <n-tag type="success">
                                                 节点
@@ -216,18 +222,11 @@
                                                     </n-icon></template>
                                                 查询&#8194;
                                             </n-button>
-                                            <n-button @click="exportExcel" style="margin-left: 20px;">
-                                                <template #icon><n-icon>
-                                                        <DownloadOutline />
-                                                    </n-icon></template>
-                                                导出&#8194;
-                                            </n-button>
                                             <n-button @click="ChangeRoute('/BarManage')" style="margin-left: 20px;">
                                                 <template #icon><n-icon>
                                                         <BarChart />
                                                     </n-icon></template>
                                                 直方图&#8194;
-
                                             </n-button>
                                             <n-button @click="ChangeRoute('/LineManage')" style="margin-left: 20px;">
                                                 <template #icon><n-icon>
@@ -237,91 +236,24 @@
                                             </n-button>
                                         </div>
                                         <div style="display: flex; ">
-                                            <n-table :bordered="true" :single-line="false" style="margin-top:20px;">
-                                                <thead>
-                                                    <tr>
-
-                                                        <th class="hidden-480">数据编号</th>
-                                                        <th class="hidden-480">区域</th>
-                                                        <th>设备节点</th>
-                                                        <th>时间</th>
-                                                        <th>温度</th>
-                                                        <th>湿度</th>
-                                                        <th>降雨量</th>
-                                                        <th>海拔</th>
-                                                        <th>PM2.5</th>
-                                                        <th>风向</th>
-                                                        <th>风速</th>
-                                                        <th>PM10</th>
-                                                        <th>压强</th>
-                                                        <th v-if="(user.role == 0)">操作</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-
-                                                    <tr v-for="(data, index) in dataList">
-                                                        <td>{{ data.id }}</td>
-                                                        <td>{{ data.area_id }}</td>
-                                                        <td>{{ data.node_id }}</td>
-                                                        <td>{{ data.date }}</td>
-                                                        <td>{{ data.temperature }}</td>
-                                                        <td>{{ data.humidity }}</td>
-                                                        <td>{{ data.rainfall }}</td>
-                                                        <td>{{ data.altitude }}</td>
-                                                        <td>{{ data.pm2dot5 }}</td>
-                                                        <td>{{ data.windDirection }}</td>
-                                                        <td>{{ data.windSpeed }}</td>
-                                                        <td>{{ data.pm10 }}</td>
-                                                        <td>{{ data.pressure }}</td>
-                                                        <td>
-                                                            <n-button @click="updateValue(school)">
-                                                                <template #icon><n-icon>
-                                                                        <CreateOutline />
-                                                                    </n-icon></template>
-                                                                修改&#8194;
-                                                            </n-button>
-                                                            <n-button @click="toDelete(school)"
-                                                                style="margin-left:20px;">
-                                                                <template #icon><n-icon>
-                                                                        <TrashOutline />
-                                                                    </n-icon></template>
-                                                                删除&#8194;
-                                                            </n-button>
-                                                        </td>
-                                                    </tr>
-
-                                                </tbody>
-                                            </n-table>
-
+                                            <div id="myChart" :style="{ width: '1500px', height: '550px' }"></div>
                                             <br />
                                         </div>
                                         <n-pagination @update:page="loadUserInfo" v-model:page="pageInfo.pageNum"
                                             :page-count="pageInfo.pageCount" style="margin-top: 20px;" />
                                     </div>
                                 </div>
-
                                 <div class="vspace-sm"></div>
-
-
                             </div><!-- /row -->
-
                             <div class="hr hr32 hr-dotted"></div>
-
                             <!-- PAGE CONTENT ENDS -->
                         </div><!-- /.col -->
                     </div><!-- /.row -->
-
-
                 </div><!-- /.page-content -->
             </div><!-- /.main-content -->
 
         </div><!-- /.main-container-inner -->
-
-
-
-
     </body>
-
 </template>
 
 <script setup>
@@ -331,7 +263,6 @@ import { Search, CashOutline as CashIcon, BarChart, PieChartOutline } from '@vic
 import InjectToken from '../components/InjectToken.vue'
 import { AddCircleOutline, RefreshCircleOutline, SearchOutline, TrashOutline, CreateOutline, DownloadOutline } from "@vicons/ionicons5"
 import { useRouter, useRoute } from 'vue-router'
-import { eq, flatMap, upperCase } from 'lodash'
 import * as echarts from 'echarts'  // 5.0 版本后echarts的引入方式
 const router = useRouter()
 const route = useRoute()
@@ -339,8 +270,6 @@ const route = useRoute()
 const serverUrl = inject("serverUrl")
 const axios = inject("axios")
 const message = inject("message")
-const fileDownload = inject("fileDownload")
-const showUpdateModel = ref(false)
 
 const user = reactive({
     avatarUrl: "",
@@ -348,8 +277,6 @@ const user = reactive({
     id: 0,
     role: 1,
 })
-
-
 
 
 const equipOptions = ref([])
@@ -369,9 +296,93 @@ const pageInfo = reactive({
 // 页面加载时就执行
 onMounted(() => {
     loadUserInfo()
-
 })
 
+
+let echart = () => {
+    let myChart = echarts.init(document.getElementById("myChart"));
+    // 绘制图表
+    myChart.setOption({
+        title: {
+            text: '折线图'
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {
+            data: ['温度', '湿度', '降雨量', 'PM2.5', '风向', '风速', 'PM10', '压强']
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        toolbox: {
+            feature: {
+                saveAsImage: {}
+            }
+        },
+        xAxis: {
+            name: '时间',
+            type: 'category',
+            boundaryGap: false,
+            data: date_x
+        },
+        yAxis: {
+            name: '数值',
+            type: 'value'
+        },
+        series: [
+            {
+                name: '温度',
+                type: 'line',
+
+                data: temperature_y
+            },
+            {
+                name: '湿度',
+                type: 'line',
+
+                data: humidity_y
+            },
+            {
+                name: '降雨量',
+                type: 'line',
+                stack: 'Total',
+                data: rainfall_y
+            },
+            {
+                name: 'PM2.5',
+                type: 'line',
+                data: pm2dot5_y
+            },
+            {
+                name: '风向',
+                type: 'line',
+                data: windDirection_y
+            },
+            {
+                name: '风速',
+                type: 'line',
+                data: windSpeed_y
+            },
+            {
+                name: 'PM10',
+                type: 'line',
+                data: pm10_y
+            },
+            {
+                name: '压强',
+                type: 'line',
+                data: pressure_y
+            }
+        ]
+    });
+    window.onresize = function () { // 自适应大小
+        myChart.resize();
+    };
+}
 const search = () => {
     pageInfo.pageNum = 1
     loadUserInfo()
@@ -386,6 +397,18 @@ const loadUserInfo = async () => {
         loadData(0, user.id)
     }
 }
+var date_x = new Array() // x轴坐标:日期时间
+var temperature_y = new Array()  // y轴坐标
+var humidity_y = new Array()// y轴坐标
+var rainfall_y = new Array()  // y轴坐标
+var altitude_y = new Array()  // y轴坐标
+var pm2dot5_y = new Array()  // y轴坐标
+var windDirection_y = new Array() // y轴坐标
+var windSpeed_y = new Array() // y轴坐标
+var pm10_y = new Array()// y轴坐标
+var pressure_y = new Array() // y轴坐标
+
+
 const loadData = async (pageNum = 0, id) => {
     if (pageNum != 0) {
         pageInfo.pageNum = pageNum;
@@ -395,6 +418,19 @@ const loadData = async (pageNum = 0, id) => {
     console.log("res", res)
     if (res.data.code == 200) {
         dataList.value = res.data.data.dataList
+        for (let i = 0; i < pageInfo.pageSize; i++) {
+            date_x[i] = dataList.value[i].date
+            temperature_y[i] = dataList.value[i].temperature
+            humidity_y[i] = dataList.value[i].humidity
+            rainfall_y[i] = dataList.value[i].rainfall
+            altitude_y[i] = dataList.value[i].altitude
+            pm2dot5_y[i] = dataList.value[i].pm2dot5
+            windDirection_y[i] = dataList.value[i].windDirection
+            windSpeed_y[i] = dataList.value[i].windSpeed
+            pm10_y[i] = dataList.value[i].pm10
+            pressure_y[i] = dataList.value[i].pressure
+        }
+        echart()
         equipOptions.value = res.data.data.equipListAll.map((item) => {
             return {
                 label: item.nodeName,
@@ -408,7 +444,6 @@ const loadData = async (pageNum = 0, id) => {
             }
         })
     } else {
-        console.log(res.data.code)
         message.error(res.data.msg)
     }
     pageInfo.count = res.data.data.count;

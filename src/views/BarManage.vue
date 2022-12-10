@@ -184,6 +184,15 @@
                     </div>
 
                     <div class="page-content">
+                        <div class="page-header">
+                            <h1>
+                                <small>
+                                    <i class="icon-double-angle-right"></i>
+                                    直方图
+                                </small>
+                            </h1>
+                        </div><!-- /.page-header -->
+
                         <div class="row">
                             <div class="col-xs-12">
                                 <!-- PAGE CONTENT BEGINS -->
@@ -216,12 +225,7 @@
                                                     </n-icon></template>
                                                 查询&#8194;
                                             </n-button>
-                                            <n-button @click="exportExcel" style="margin-left: 20px;">
-                                                <template #icon><n-icon>
-                                                        <DownloadOutline />
-                                                    </n-icon></template>
-                                                导出&#8194;
-                                            </n-button>
+
                                             <n-button @click="ChangeRoute('/BarManage')" style="margin-left: 20px;">
                                                 <template #icon><n-icon>
                                                         <BarChart />
@@ -237,66 +241,11 @@
                                             </n-button>
                                         </div>
                                         <div style="display: flex; ">
-                                            <n-table :bordered="true" :single-line="false" style="margin-top:20px;">
-                                                <thead>
-                                                    <tr>
-
-                                                        <th class="hidden-480">数据编号</th>
-                                                        <th class="hidden-480">区域</th>
-                                                        <th>设备节点</th>
-                                                        <th>时间</th>
-                                                        <th>温度</th>
-                                                        <th>湿度</th>
-                                                        <th>降雨量</th>
-                                                        <th>海拔</th>
-                                                        <th>PM2.5</th>
-                                                        <th>风向</th>
-                                                        <th>风速</th>
-                                                        <th>PM10</th>
-                                                        <th>压强</th>
-                                                        <th v-if="(user.role == 0)">操作</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-
-                                                    <tr v-for="(data, index) in dataList">
-                                                        <td>{{ data.id }}</td>
-                                                        <td>{{ data.area_id }}</td>
-                                                        <td>{{ data.node_id }}</td>
-                                                        <td>{{ data.date }}</td>
-                                                        <td>{{ data.temperature }}</td>
-                                                        <td>{{ data.humidity }}</td>
-                                                        <td>{{ data.rainfall }}</td>
-                                                        <td>{{ data.altitude }}</td>
-                                                        <td>{{ data.pm2dot5 }}</td>
-                                                        <td>{{ data.windDirection }}</td>
-                                                        <td>{{ data.windSpeed }}</td>
-                                                        <td>{{ data.pm10 }}</td>
-                                                        <td>{{ data.pressure }}</td>
-                                                        <td>
-                                                            <n-button @click="updateValue(school)">
-                                                                <template #icon><n-icon>
-                                                                        <CreateOutline />
-                                                                    </n-icon></template>
-                                                                修改&#8194;
-                                                            </n-button>
-                                                            <n-button @click="toDelete(school)"
-                                                                style="margin-left:20px;">
-                                                                <template #icon><n-icon>
-                                                                        <TrashOutline />
-                                                                    </n-icon></template>
-                                                                删除&#8194;
-                                                            </n-button>
-                                                        </td>
-                                                    </tr>
-
-                                                </tbody>
-                                            </n-table>
+                                            <div id="myChart" :style="{ width: '1500px', height: '550px' }"></div>
 
                                             <br />
                                         </div>
-                                        <n-pagination @update:page="loadUserInfo" v-model:page="pageInfo.pageNum"
-                                            :page-count="pageInfo.pageCount" style="margin-top: 20px;" />
+
                                     </div>
                                 </div>
 
@@ -339,6 +288,7 @@ const route = useRoute()
 const serverUrl = inject("serverUrl")
 const axios = inject("axios")
 const message = inject("message")
+const dialog = inject("dialog")
 const fileDownload = inject("fileDownload")
 const showUpdateModel = ref(false)
 
@@ -349,6 +299,11 @@ const user = reactive({
     role: 1,
 })
 
+
+const formRef = ref(null)
+const bodyStyle = {
+    width: "650px"
+}
 
 
 
@@ -369,9 +324,80 @@ const pageInfo = reactive({
 // 页面加载时就执行
 onMounted(() => {
     loadUserInfo()
-
 })
 
+
+
+const zhifangtu = () => {
+    showUpdateModel.value = true
+    window.onload = function () {
+        let myChart = echarts.init(document.getElementById("zhifangtu"));
+        myChart.setOption({
+            title: {
+                text: 'Stacked Line'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['Email', 'Union Ads', 'Video Ads']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: ['Mon', 'Tue', 'Wed']
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name: 'Email',
+                    type: 'line',
+                    stack: 'Total',
+                    data: [120, 132, 101]
+                },
+                {
+                    name: 'Union Ads',
+                    type: 'line',
+                    stack: 'Total',
+                    data: [220, 182, 191]
+                },
+                {
+                    name: 'Video Ads',
+                    type: 'line',
+                    stack: 'Total',
+                    data: [150, 232, 201]
+                },
+                {
+                    name: 'Direct',
+                    type: 'line',
+                    stack: 'Total',
+                    data: [320, 332, 301]
+                },
+                {
+                    name: 'Search Engine',
+                    type: 'line',
+                    stack: 'Total',
+                    data: [820, 932, 901]
+                }
+            ]
+        });
+
+    }
+
+}
 const search = () => {
     pageInfo.pageNum = 1
     loadUserInfo()
