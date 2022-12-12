@@ -211,6 +211,7 @@
 
                                                         <th class="hidden-480">物理量编号</th>
                                                         <th class="hidden-480">物理量名</th>
+                                                        <th>中文名</th>
                                                         <th>物理意义</th>
                                                         <th>换算方式</th>
                                                         <th v-if="(user.role == 0)">操作</th>
@@ -224,6 +225,7 @@
                                                             {{ phy.id }}
                                                         </td>
                                                         <td class="hidden-480">{{ phy.physicalName }}</td>
+                                                        <td>{{ phy.chinese_name }}</td>
                                                         <td class="hidden-480">
                                                             {{ phy.meaning }}
                                                         </td>
@@ -257,10 +259,11 @@
                                             <n-input v-model:value="upPhy.id" :disabled="!active" />
                                         </n-form-item>
                                         <n-form-item label="物理量名">
-                                            <n-input v-model:value="upPhy.physicalName" placeholder="物理量名" clearable />
+                                            <n-input v-model:value="upPhy.physicalName" placeholder="物理量名" clearable
+                                                :disabled="!active" />
                                         </n-form-item>
                                         <n-form-item label="物理意义">
-                                            <n-input v-model:value="upPhy.meaning" size="large" round
+                                            <n-input type="textarea" v-model:value="upPhy.meaning" size="large" round
                                                 placeholder="物理意义" />
                                         </n-form-item>
                                         <n-form-item label="换算方式" path="duration">

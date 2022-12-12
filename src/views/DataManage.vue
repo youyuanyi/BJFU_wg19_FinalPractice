@@ -245,16 +245,16 @@
                                                         <th class="hidden-480">区域</th>
                                                         <th>设备节点</th>
                                                         <th>时间</th>
-                                                        <th>温度</th>
-                                                        <th>湿度</th>
-                                                        <th>降雨量</th>
-                                                        <th>海拔</th>
-                                                        <th>PM2.5</th>
+                                                        <th>温度(℃)</th>
+                                                        <th>湿度(%RH)</th>
+                                                        <th>降雨量(mm)</th>
+                                                        <th>海拔(m)</th>
+                                                        <th>PM2.5(μg/m³)</th>
                                                         <th>风向</th>
-                                                        <th>风速</th>
-                                                        <th>PM10</th>
-                                                        <th>压强</th>
-                                                        <th v-if="(user.role == 0)">操作</th>
+                                                        <th>风速(m/s)</th>
+                                                        <th>PM10(μg/m³)</th>
+                                                        <th>压强(KhPa)</th>
+
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -269,25 +269,19 @@
                                                         <td>{{ data.rainfall }}</td>
                                                         <td>{{ data.altitude }}</td>
                                                         <td>{{ data.pm2dot5 }}</td>
-                                                        <td>{{ data.windDirection }}</td>
+                                                        <td v-if="(data.windDirection == 1)"> 正北风 </td>
+                                                        <td v-else-if="(data.windDirection == 2)"> 正南风 </td>
+                                                        <td v-else-if="(data.windDirection == 3)">正西风 </td>
+                                                        <td v-else-if="(data.windDirection == 4)"> 正东风 </td>
+                                                        <td v-else-if="(data.windDirection == 5)"> 东偏北风 </td>
+                                                        <td v-else-if="(data.windDirection == 6)"> 东偏南风 </td>
+                                                        <td v-else-if="(data.windDirection == 7)"> 西偏北风 </td>
+                                                        <td v-else-if="(data.windDirection == 8)"> 西偏南风 </td>
+
                                                         <td>{{ data.windSpeed }}</td>
                                                         <td>{{ data.pm10 }}</td>
                                                         <td>{{ data.pressure }}</td>
-                                                        <td>
-                                                            <n-button @click="updateValue(school)">
-                                                                <template #icon><n-icon>
-                                                                        <CreateOutline />
-                                                                    </n-icon></template>
-                                                                修改&#8194;
-                                                            </n-button>
-                                                            <n-button @click="toDelete(school)"
-                                                                style="margin-left:20px;">
-                                                                <template #icon><n-icon>
-                                                                        <TrashOutline />
-                                                                    </n-icon></template>
-                                                                删除&#8194;
-                                                            </n-button>
-                                                        </td>
+
                                                     </tr>
 
                                                 </tbody>
@@ -357,7 +351,7 @@ const dataOptions = ref([])
 const dataList = ref([])
 const pageInfo = reactive({
     pageNum: 1,
-    pageSize: 6,
+    pageSize: 10,
     pageCount: 0,
     count: 0,
     nodeID: "",

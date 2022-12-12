@@ -197,10 +197,7 @@
                             <div class="col-xs-12">
                                 <!-- PAGE CONTENT BEGINS -->
                                 <div class="row">
-
                                     <div class="col-xs-12">
-
-
                                         <div style="display: flex; margin-top: 10px;">
                                             <n-tag type="success">
                                                 节点
@@ -225,13 +222,11 @@
                                                     </n-icon></template>
                                                 查询&#8194;
                                             </n-button>
-
                                             <n-button @click="ChangeRoute('/BarManage')" style="margin-left: 20px;">
                                                 <template #icon><n-icon>
                                                         <BarChart />
                                                     </n-icon></template>
                                                 直方图&#8194;
-
                                             </n-button>
                                             <n-button @click="ChangeRoute('/LineManage')" style="margin-left: 20px;">
                                                 <template #icon><n-icon>
@@ -242,35 +237,23 @@
                                         </div>
                                         <div style="display: flex; ">
                                             <div id="myChart" :style="{ width: '1500px', height: '550px' }"></div>
-
                                             <br />
                                         </div>
-
+                                        <n-pagination @update:page="loadUserInfo" v-model:page="pageInfo.pageNum"
+                                            :page-count="pageInfo.pageCount" style="margin-top: 20px;" />
                                     </div>
                                 </div>
-
                                 <div class="vspace-sm"></div>
-
-
                             </div><!-- /row -->
-
                             <div class="hr hr32 hr-dotted"></div>
-
                             <!-- PAGE CONTENT ENDS -->
                         </div><!-- /.col -->
                     </div><!-- /.row -->
-
-
                 </div><!-- /.page-content -->
             </div><!-- /.main-content -->
 
         </div><!-- /.main-container-inner -->
-
-
-
-
     </body>
-
 </template>
 
 <script setup>
@@ -280,7 +263,6 @@ import { Search, CashOutline as CashIcon, BarChart, PieChartOutline } from '@vic
 import InjectToken from '../components/InjectToken.vue'
 import { AddCircleOutline, RefreshCircleOutline, SearchOutline, TrashOutline, CreateOutline, DownloadOutline } from "@vicons/ionicons5"
 import { useRouter, useRoute } from 'vue-router'
-import { eq, flatMap, upperCase } from 'lodash'
 import * as echarts from 'echarts'  // 5.0 版本后echarts的引入方式
 const router = useRouter()
 const route = useRoute()
@@ -288,9 +270,6 @@ const route = useRoute()
 const serverUrl = inject("serverUrl")
 const axios = inject("axios")
 const message = inject("message")
-const dialog = inject("dialog")
-const fileDownload = inject("fileDownload")
-const showUpdateModel = ref(false)
 
 const user = reactive({
     avatarUrl: "",
@@ -298,13 +277,6 @@ const user = reactive({
     id: 0,
     role: 1,
 })
-
-
-const formRef = ref(null)
-const bodyStyle = {
-    width: "650px"
-}
-
 
 
 const equipOptions = ref([])
@@ -327,76 +299,95 @@ onMounted(() => {
 })
 
 
+let echart = () => {
+    let myChart = echarts.init(document.getElementById("myChart"));
+    // 绘制图表
+    myChart.setOption({
+        title: {
+            text: '直方图'
+        },
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            data: ['温度(℃)', '湿度(%RH)', '降雨量(mm)', '海拔(m)', 'PM2.5(μg/m³)', '风向', '风速(m/s)', 'PM10(μg/m³)', '压强(KhPa)']
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        toolbox: {
+            feature: {
+                saveAsImage: {}
+            }
+        },
+        xAxis: {
+            name: '时间',
+            type: 'category',
+            boundaryGap: false,
+            data: date_x
+        },
+        yAxis: {
+            name: '数值',
+            type: 'value'
+        },
+        series: [
+            {
+                name: '温度(℃)',
+                type: 'bar',
 
-const zhifangtu = () => {
-    showUpdateModel.value = true
-    window.onload = function () {
-        let myChart = echarts.init(document.getElementById("zhifangtu"));
-        myChart.setOption({
-            title: {
-                text: 'Stacked Line'
+                data: temperature_y
             },
-            tooltip: {
-                trigger: 'axis'
-            },
-            legend: {
-                data: ['Email', 'Union Ads', 'Video Ads']
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            toolbox: {
-                feature: {
-                    saveAsImage: {}
-                }
-            },
-            xAxis: {
-                type: 'category',
-                boundaryGap: false,
-                data: ['Mon', 'Tue', 'Wed']
-            },
-            yAxis: {
-                type: 'value'
-            },
-            series: [
-                {
-                    name: 'Email',
-                    type: 'line',
-                    stack: 'Total',
-                    data: [120, 132, 101]
-                },
-                {
-                    name: 'Union Ads',
-                    type: 'line',
-                    stack: 'Total',
-                    data: [220, 182, 191]
-                },
-                {
-                    name: 'Video Ads',
-                    type: 'line',
-                    stack: 'Total',
-                    data: [150, 232, 201]
-                },
-                {
-                    name: 'Direct',
-                    type: 'line',
-                    stack: 'Total',
-                    data: [320, 332, 301]
-                },
-                {
-                    name: 'Search Engine',
-                    type: 'line',
-                    stack: 'Total',
-                    data: [820, 932, 901]
-                }
-            ]
-        });
+            {
+                name: '湿度(%RH)',
+                type: 'bar',
 
-    }
+                data: humidity_y
+            },
+            {
+                name: '降雨量(mm)',
+                type: 'bar',
 
+                data: rainfall_y
+            },
+            {
+                name: '海拔(m)',
+                type: 'bar',
+
+                data: altitude_y
+            },
+            {
+                name: 'PM2.5(μg/m³)',
+                type: 'bar',
+                data: pm2dot5_y
+            },
+            {
+                name: '风向',
+                type: 'bar',
+                data: windDirection_y
+            },
+            {
+                name: '风速(m/s)',
+                type: 'bar',
+                data: windSpeed_y
+            },
+            {
+                name: 'PM10(μg/m³)',
+                type: 'bar',
+                data: pm10_y
+            },
+            {
+                name: '压强(KhPa)',
+                type: 'bar',
+                data: pressure_y
+            }
+        ]
+    });
+    window.onresize = function () { // 自适应大小
+        myChart.resize();
+    };
 }
 const search = () => {
     pageInfo.pageNum = 1
@@ -412,6 +403,18 @@ const loadUserInfo = async () => {
         loadData(0, user.id)
     }
 }
+var date_x = new Array() // x轴坐标:日期时间
+var temperature_y = new Array()  // y轴坐标
+var humidity_y = new Array()// y轴坐标
+var rainfall_y = new Array()  // y轴坐标
+var altitude_y = new Array()  // y轴坐标
+var pm2dot5_y = new Array()  // y轴坐标
+var windDirection_y = new Array() // y轴坐标
+var windSpeed_y = new Array() // y轴坐标
+var pm10_y = new Array()// y轴坐标
+var pressure_y = new Array() // y轴坐标
+
+
 const loadData = async (pageNum = 0, id) => {
     if (pageNum != 0) {
         pageInfo.pageNum = pageNum;
@@ -421,6 +424,19 @@ const loadData = async (pageNum = 0, id) => {
     console.log("res", res)
     if (res.data.code == 200) {
         dataList.value = res.data.data.dataList
+        for (let i = 0; i < pageInfo.pageSize; i++) {
+            date_x[i] = dataList.value[i].date
+            temperature_y[i] = dataList.value[i].temperature
+            humidity_y[i] = dataList.value[i].humidity
+            rainfall_y[i] = dataList.value[i].rainfall
+            altitude_y[i] = dataList.value[i].altitude
+            pm2dot5_y[i] = dataList.value[i].pm2dot5
+            windDirection_y[i] = dataList.value[i].windDirection
+            windSpeed_y[i] = dataList.value[i].windSpeed
+            pm10_y[i] = dataList.value[i].pm10
+            pressure_y[i] = dataList.value[i].pressure
+        }
+        echart()
         equipOptions.value = res.data.data.equipListAll.map((item) => {
             return {
                 label: item.nodeName,
@@ -434,7 +450,6 @@ const loadData = async (pageNum = 0, id) => {
             }
         })
     } else {
-        console.log(res.data.code)
         message.error(res.data.msg)
     }
     pageInfo.count = res.data.data.count;

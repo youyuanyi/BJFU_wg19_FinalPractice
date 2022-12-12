@@ -25,6 +25,7 @@
                     <ul class="nav ace-nav">
                         <li class="light-blue">
                             <a data-toggle="dropdown" href="#" class="dropdown-toggle">
+
                                 <!-- <img class="nav-user-photo" src="../assets/bootstrap/avatars/user.jpg"
 									alt="Jason's Photo" /> -->
                                 <InjectToken></InjectToken>
@@ -160,80 +161,34 @@
                 </div>
 
                 <div class="main-content">
-                    <div class="breadcrumbs" id="breadcrumbs">
-
-                        <ul class="breadcrumb">
-                            <li>
-                                <i class="icon-home home-icon"></i>
-                                <a href="#/index">首页</a>
-                            </li>
-                            <li class="active">控制台</li>
-                        </ul><!-- .breadcrumb -->
-
-                        <div class="nav-search" id="nav-search">
-                            <form class="form-search">
-                                <span class="input-icon">
-                                    <input type="text" placeholder="Search ..." class="nav-search-input"
-                                        id="nav-search-input" autocomplete="off" />
-                                    <i class="icon-search nav-search-icon"></i>
-                                </span>
-                            </form>
-                        </div><!-- #nav-search -->
-                    </div>
 
                     <div class="page-content">
-                        <div class="page-header">
-
-                            <h1>
-
-                                <small>
-                                    <i class="icon-double-angle-right"></i>
-                                    首页
-                                </small>
-                            </h1>
-
-                        </div><!-- /.page-header -->
 
                         <div class="row">
                             <div class="col-xs-12">
                                 <!-- PAGE CONTENT BEGINS -->
+                                <n-card size="medium">
 
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="table-responsive">
-                                            <table id="sample-table-1"
-                                                class="table table-striped table-bordered table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th>HeadID</th>
-                                                        <th class="hidden-480">源IP</th>
-                                                        <th class="hidden-480">目的IP</th>
-                                                        <th>类型</th>
-                                                        <th>访问内容</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
+                                    <n-carousel autoplay show-arrow>
+                                        <img class="carousel-img"
+                                            src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel1.jpeg">
+                                        <img class="carousel-img"
+                                            src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel2.jpeg">
+                                        <img class="carousel-img"
+                                            src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel3.jpeg">
+                                        <img class="carousel-img"
+                                            src="https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel4.jpeg">
+                                    </n-carousel>
 
-                                                    <tr>
+                                </n-card>
 
-                                                        <td>
-                                                            1
-                                                        </td>
-                                                        <td class="hidden-480">2</td>
-                                                        <td class="hidden-480">3</td>
-                                                        <td>4</td>
-                                                        <td>5</td>
-                                                    </tr>
-
-
-                                                </tbody>
-                                            </table>
-                                            <br />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="vspace-sm"></div>
+                                <n-card size="medium" hoverable title="技术路线">
+                                    <n-card size="medium" hoverable title="CS">
+                                        ewrjijiuhio
+                                    </n-card><n-card size="medium" hoverable title="Web">
+                                        ewrjijiuhio
+                                    </n-card>
+                                </n-card>
 
 
                             </div><!-- /row -->
@@ -336,6 +291,12 @@ function ChangeRoute(dir) {
     background: white;
     box-shadow: 0px 1px 3px #D3D4D8;
     border-radius: 5px;
+}
+
+.carousel-img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
 }
 </style>
 

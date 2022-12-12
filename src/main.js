@@ -9,7 +9,7 @@ import axios, { formToJSON } from "axios"; // 引入axios
 import { UserStore } from "./stores/UserStore" // 引入UserStore
 import fileDownload from 'js-file-download'; 
 
-axios.defaults.baseURL = "http://127.0.0.1:8080"; // 服务端地址全局配置
+axios.defaults.baseURL = "http://1.15.56.246:8080"; // 服务端地址全局配置
 const { message, notification, dialog } = createDiscreteApi(["message", "notification", "dialog"])
 
 const app = createApp(App);

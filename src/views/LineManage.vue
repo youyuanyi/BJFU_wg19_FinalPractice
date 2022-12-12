@@ -310,7 +310,7 @@ let echart = () => {
             trigger: 'axis'
         },
         legend: {
-            data: ['温度', '湿度', '降雨量', 'PM2.5', '风向', '风速', 'PM10', '压强']
+            data: ['温度(℃)', '湿度(%RH)', '降雨量(mm)', '海拔(m)', 'PM2.5(μg/m³)', '风向', '风速(m/s)', 'PM10(μg/m³)', '压强(KhPa)']
         },
         grid: {
             left: '3%',
@@ -335,25 +335,31 @@ let echart = () => {
         },
         series: [
             {
-                name: '温度',
+                name: '温度(℃)',
                 type: 'line',
 
                 data: temperature_y
             },
             {
-                name: '湿度',
+                name: '湿度(%RH)',
                 type: 'line',
 
                 data: humidity_y
             },
             {
-                name: '降雨量',
+                name: '降雨量(mm)',
                 type: 'line',
                 stack: 'Total',
                 data: rainfall_y
             },
             {
-                name: 'PM2.5',
+                name: '海拔(m)',
+                type: 'line',
+
+                data: altitude_y
+            },
+            {
+                name: 'PM2.5(μg/m³)',
                 type: 'line',
                 data: pm2dot5_y
             },
@@ -363,17 +369,17 @@ let echart = () => {
                 data: windDirection_y
             },
             {
-                name: '风速',
+                name: '风速(m/s)',
                 type: 'line',
                 data: windSpeed_y
             },
             {
-                name: 'PM10',
+                name: 'PM10(μg/m³)',
                 type: 'line',
                 data: pm10_y
             },
             {
-                name: '压强',
+                name: '压强(KhPa)',
                 type: 'line',
                 data: pressure_y
             }

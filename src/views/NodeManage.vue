@@ -209,6 +209,14 @@
                                             <n-button @click="showModal = true" type="info">
                                                 新建设备
                                             </n-button>
+
+                                            <n-button @click="changeSystemTime" type="success"
+                                                style="margin-left:700px;">
+                                                修改系统时间
+                                            </n-button>
+                                            <n-date-picker style="width: 300px;"
+                                                v-model:formatted-value="formattedValue"
+                                                value-format="yyyy.MM.dd HH:mm:ss" type="datetime" clearable />
                                             <n-modal v-model:show="showModal" class="custom-card" preset="card"
                                                 :style="bodyStyle" title="添加设备" size="huge" :bordered="false"
                                                 :segmented="segmented">
@@ -297,7 +305,8 @@
                                             <n-input v-model:value="upNode.nodeName" placeholder="设备名" clearable />
                                         </n-form-item>
                                         <n-form-item label="状态" path="password">
-                                            <n-select v-model:value="upNode.state" :options="nodeOptions" />
+                                            <n-select v-model:value="upNode.state" :options="nodeOptions"
+                                                :disabled="!active" />
                                         </n-form-item>
                                         <n-form-item label="采集周期" path="duration">
                                             <n-input v-model:value="upNode.duration" size="large" round
@@ -355,7 +364,9 @@ const user = reactive({
     id: 0,
     role: 1,
 })
-
+const systemTime = reactive({
+    sysTime: "",
+})
 const pageInfo = reactive({
     pageNum: 1,
     pageSize: 5,
@@ -459,6 +470,7 @@ function addNode() {
 }
 const closeModal = () => {
     showModal.value = false;
+    showUpdateModel.value = false;
 }
 const realAddNode = async () => {
     var d = new Number(newNode.duration)
@@ -508,7 +520,6 @@ const update = async () => {
         state: upNode.state,
         duration: d
     })
-    console.log(res)
     if (res.data.code == 200) {
         message.success(res.data.msg)
         loadUserInfo()
@@ -527,7 +538,6 @@ const toDelete = async (id) => {
         positiveText: '确定',
         negativeText: '取消',
         onPositiveClick: async () => {
-            console.log(id)
             let res = await axios.delete("node/" + id)
             if (res.data.code == 200) {
                 message.info(res.data.msg)
@@ -540,6 +550,14 @@ const toDelete = async (id) => {
         onNegativeClick: () => { }
     })
 }
+
+const formattedValue = ref()
+const changeSystemTime = async () => {
+    let res = await axios.post(`/node/setTime?time=${formattedValue.value}`)
+    console.log("res:", res)
+
+}
+
 function ChangeRoute(dir) {
     router.push(dir)
 
