@@ -555,6 +555,13 @@ const formattedValue = ref()
 const changeSystemTime = async () => {
     let res = await axios.post(`/node/setTime?time=${formattedValue.value}`)
     console.log("res:", res)
+    if (res.data.code == 200) {
+        message.success(res.data.msg)
+        loadUserInfo()
+        loadAllNodes()
+    } else {
+        message.error(res.data.msg)
+    }
 
 }
 
