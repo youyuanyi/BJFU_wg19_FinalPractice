@@ -197,12 +197,15 @@
                                                 节点
                                             </n-tag>
                                             <n-select v-model:value="pageInfo.nodeID" :options="equipOptions"
-                                                style="width: 150px; margin-left:5px;margin-right:20px;" filterable />
+                                                @change="changeNode(pageInfo.nodeID)"
+                                                style="width: 150px; margin-left:5px;margin-right:20px;" filterable
+                                                clearable />
                                             <n-tag type="success">
                                                 数据种类
                                             </n-tag>
                                             <n-select v-model:value="pageInfo.dataName" :options="dataOptions"
-                                                style="width: 150px; margin-left:5px;margin-right: 20px;" filterable />
+                                                style="width: 150px; margin-left:5px;margin-right: 20px;" filterable
+                                                clearable />
 
                                             <n-tag type="success">
                                                 时间段
@@ -245,15 +248,15 @@
                                                         <th class="hidden-480">区域</th>
                                                         <th>设备节点</th>
                                                         <th>时间</th>
-                                                        <th>温度(℃)</th>
-                                                        <th>湿度(%RH)</th>
-                                                        <th>降雨量(mm)</th>
-                                                        <th>海拔(m)</th>
-                                                        <th>PM2.5(μg/m³)</th>
-                                                        <th>风向</th>
-                                                        <th>风速(m/s)</th>
-                                                        <th>PM10(μg/m³)</th>
-                                                        <th>压强(KhPa)</th>
+                                                        <th>{{ tableHead.data1 }}</th>
+                                                        <th>{{ tableHead.data2 }}</th>
+                                                        <th>{{ tableHead.data3 }}</th>
+                                                        <th>{{ tableHead.data4 }}</th>
+                                                        <th>{{ tableHead.data5 }}</th>
+                                                        <th>{{ tableHead.data6 }}</th>
+                                                        <th>{{ tableHead.data7 }}</th>
+                                                        <th>{{ tableHead.data8 }}</th>
+                                                        <th>{{ tableHead.data9 }}</th>
 
                                                     </tr>
                                                 </thead>
@@ -264,23 +267,15 @@
                                                         <td>{{ data.area_id }}</td>
                                                         <td>{{ data.node_id }}</td>
                                                         <td>{{ data.date }}</td>
-                                                        <td>{{ data.temperature }}</td>
-                                                        <td>{{ data.humidity }}</td>
-                                                        <td>{{ data.rainfall }}</td>
-                                                        <td>{{ data.altitude }}</td>
-                                                        <td>{{ data.pm2dot5 }}</td>
-                                                        <td v-if="(data.windDirection == 1)"> 正北风 </td>
-                                                        <td v-else-if="(data.windDirection == 2)"> 正南风 </td>
-                                                        <td v-else-if="(data.windDirection == 3)">正西风 </td>
-                                                        <td v-else-if="(data.windDirection == 4)"> 正东风 </td>
-                                                        <td v-else-if="(data.windDirection == 5)"> 东偏北风 </td>
-                                                        <td v-else-if="(data.windDirection == 6)"> 东偏南风 </td>
-                                                        <td v-else-if="(data.windDirection == 7)"> 西偏北风 </td>
-                                                        <td v-else-if="(data.windDirection == 8)"> 西偏南风 </td>
-
-                                                        <td>{{ data.windSpeed }}</td>
-                                                        <td>{{ data.pm10 }}</td>
-                                                        <td>{{ data.pressure }}</td>
+                                                        <td>{{ data.data1 }}</td>
+                                                        <td>{{ data.data2 }}</td>
+                                                        <td>{{ data.data3 }}</td>
+                                                        <td>{{ data.data4 }}</td>
+                                                        <td>{{ data.data5 }}</td>
+                                                        <td>{{ data.data6 }} </td>
+                                                        <td>{{ data.data7 }}</td>
+                                                        <td>{{ data.data8 }}</td>
+                                                        <td>{{ data.data9 }}</td>
 
                                                     </tr>
 
@@ -343,7 +338,17 @@ const user = reactive({
     role: 1,
 })
 
-
+const tableHead = reactive({
+    data1: "data1",
+    data2: "data2",
+    data3: "data3",
+    data4: "data4",
+    data5: "data5",
+    data6: "data6",
+    data7: "data7",
+    data8: "data8",
+    data9: "data9",
+})
 
 
 const equipOptions = ref([])
@@ -363,7 +368,6 @@ const pageInfo = reactive({
 // 页面加载时就执行
 onMounted(() => {
     loadUserInfo()
-
 })
 
 const search = () => {
@@ -379,6 +383,14 @@ const loadUserInfo = async () => {
         user.name = res.data.data.name
         loadData(0, user.id)
     }
+}
+
+const exportExcel = async () => {
+    var id = user.id
+    let nodeID = new Number(pageInfo.nodeID)
+    let res = await axios.get(`/data/download/${id}?dataName=${pageInfo.dataName}&nodeID=${nodeID}&time=${pageInfo.time}`, { responseType: "blob" })
+    console.log("excel res:", res)
+    fileDownload(res.data, "result.xlsx")
 }
 const loadData = async (pageNum = 0, id) => {
     if (pageNum != 0) {
@@ -397,8 +409,8 @@ const loadData = async (pageNum = 0, id) => {
         })
         dataOptions.value = res.data.data.phyList.map((item) => {
             return {
-                label: item.chinese_name,
-                value: item.physicalName,
+                label: item.dataName,
+                value: item.node_id + " " + item.data_id,
             }
         })
     } else {
@@ -409,6 +421,8 @@ const loadData = async (pageNum = 0, id) => {
     pageInfo.pageCount = parseInt(pageInfo.count / pageInfo.pageSize) + (pageInfo.count % pageInfo.pageSize > 0 ? 1 : 0)
 }
 
+
+
 const closeModal = () => {
     showUpdateModel.value = false;
 }
@@ -418,13 +432,72 @@ function ChangeRoute(dir) {
 
 }
 
-const exportExcel = async () => {
-    var id = user.id
-    var nodeID = new Number(pageInfo.nodeID)
-    let res = await axios.get(`/data/download/${id}?dataName=${pageInfo.dataName}&nodeID=${nodeID}&time=${pageInfo.time}`, { responseType: "blob" })
-    console.log(res)
-    fileDownload(res.data, "result.xlsx")
+const changeNode = async (id) => {
+    console.log("changeNode")
+    console.log("id:", id)
+    if (id == null)
+        return;
+    let res = await axios.get(`/phy/node/${id}`)
+    if (res.data.code == 200) {
+        console.log("Node res:", res)
+        let pp = res.data.data.phy
+        let count = res.data.data.count
+        for (let i = 0; i < count; i++) {
+            if (i == 0)
+                tableHead.data1 = pp[i].dataName
+            else if (i == 1)
+                tableHead.data2 = pp[i].dataName
+            else if (i == 2)
+                tableHead.data3 = pp[i].dataName
+            else if (i == 3)
+                tableHead.data4 = pp[i].dataName
+            else if (i == 4)
+                tableHead.data5 = pp[i].dataName
+            else if (i == 5)
+                tableHead.data6 = pp[i].dataName
+            else if (i == 6)
+                tableHead.data7 = pp[i].dataName
+            else if (i == 7)
+                tableHead.data8 = pp[i].dataName
+            else if (i == 8)
+                tableHead.data9 = pp[i].dataName
+        }
+        loadDataforNode(0, user.id, pp)
+    }
 }
+
+// 用于动态加载某个node的dataName选项
+const loadDataforNode = async (pageNum = 0, id, phy) => {
+    if (pageNum != 0) {
+        pageInfo.pageNum = pageNum;
+    }
+    var nodeID = new Number(pageInfo.nodeID)
+    pageInfo.pageNum = 1
+    let res = await axios.post(`/data/${id}?dataName=${pageInfo.dataName}&nodeID=${nodeID}&time=${pageInfo.time}&pageNum=${pageInfo.pageNum}&pageSize=${pageInfo.pageSize}`)
+    if (res.data.code == 200) {
+        dataList.value = res.data.data.dataList
+        equipOptions.value = res.data.data.equipListAll.map((item) => {
+            return {
+                label: item.nodeName,
+                value: item.id,
+            }
+        })
+        console.log("修改dataOptions")
+        console.log("phy:", phy)
+        dataOptions.value = phy.map((item) => {
+            return {
+                label: item.dataName,
+                value: item.node_id + " " + item.data_id,
+            }
+        })
+    } else {
+        console.log(res.data.code)
+        message.error(res.data.msg)
+    }
+    pageInfo.count = res.data.data.count;
+    pageInfo.pageCount = parseInt(pageInfo.count / pageInfo.pageSize) + (pageInfo.count % pageInfo.pageSize > 0 ? 1 : 0)
+}
+
 const goback = () => {
     router.go(-1)
 }
@@ -437,7 +510,7 @@ const goback = () => {
     left: 0;
     right: 0;
     margin: auto;
-    height: 60px;
+
     background: white;
     box-shadow: 0px 1px 3px #D3D4D8;
     border-radius: 5px;

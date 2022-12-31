@@ -202,7 +202,8 @@
                                             <n-tag type="success">
                                                 节点
                                             </n-tag>
-                                            <n-select v-model:value="pageInfo.nodeID" :options="equipOptions"
+                                            <n-select @change="changeNode(pageInfo.nodeID)"
+                                                v-model:value="pageInfo.nodeID" :options="equipOptions"
                                                 style="width: 150px; margin-left:5px;margin-right:20px;" filterable />
                                             <n-tag type="success">
                                                 数据种类
@@ -310,7 +311,7 @@ let echart = () => {
             trigger: 'item'
         },
         legend: {
-            data: ['温度(℃)', '湿度(%RH)', '降雨量(mm)', '海拔(m)', 'PM2.5(μg/m³)', '风向', '风速(m/s)', 'PM10(μg/m³)', '压强(KhPa)']
+            data: [data1, data2, data3, data4, data5, data6, data7, data8, data9]
         },
         grid: {
             left: '3%',
@@ -335,51 +336,51 @@ let echart = () => {
         },
         series: [
             {
-                name: '温度(℃)',
+                name: data1,
                 type: 'bar',
 
                 data: temperature_y
             },
             {
-                name: '湿度(%RH)',
+                name: data2,
                 type: 'bar',
 
                 data: humidity_y
             },
             {
-                name: '降雨量(mm)',
+                name: data3,
                 type: 'bar',
 
                 data: rainfall_y
             },
             {
-                name: '海拔(m)',
+                name: data4,
                 type: 'bar',
 
                 data: altitude_y
             },
             {
-                name: 'PM2.5(μg/m³)',
+                name: data5,
                 type: 'bar',
                 data: pm2dot5_y
             },
             {
-                name: '风向',
+                name: data6,
                 type: 'bar',
                 data: windDirection_y
             },
             {
-                name: '风速(m/s)',
+                name: data7,
                 type: 'bar',
                 data: windSpeed_y
             },
             {
-                name: 'PM10(μg/m³)',
+                name: data8,
                 type: 'bar',
                 data: pm10_y
             },
             {
-                name: '压强(KhPa)',
+                name: data9,
                 type: 'bar',
                 data: pressure_y
             }
@@ -414,6 +415,15 @@ var windSpeed_y = new Array() // y轴坐标
 var pm10_y = new Array()// y轴坐标
 var pressure_y = new Array() // y轴坐标
 
+let data1 = "data1";
+let data2 = "data2";
+let data3 = "data3";
+let data4 = "data4";
+let data5 = "data5";
+let data6 = "data6";
+let data7 = "data7";
+let data8 = "data8";
+let data9 = "data9";
 
 const loadData = async (pageNum = 0, id) => {
     if (pageNum != 0) {
@@ -426,15 +436,15 @@ const loadData = async (pageNum = 0, id) => {
         dataList.value = res.data.data.dataList
         for (let i = 0; i < pageInfo.pageSize; i++) {
             date_x[i] = dataList.value[i].date
-            temperature_y[i] = dataList.value[i].temperature
-            humidity_y[i] = dataList.value[i].humidity
-            rainfall_y[i] = dataList.value[i].rainfall
-            altitude_y[i] = dataList.value[i].altitude
-            pm2dot5_y[i] = dataList.value[i].pm2dot5
-            windDirection_y[i] = dataList.value[i].windDirection
-            windSpeed_y[i] = dataList.value[i].windSpeed
-            pm10_y[i] = dataList.value[i].pm10
-            pressure_y[i] = dataList.value[i].pressure
+            temperature_y[i] = dataList.value[i].data1
+            humidity_y[i] = dataList.value[i].data2
+            rainfall_y[i] = dataList.value[i].data3
+            altitude_y[i] = dataList.value[i].data4
+            pm2dot5_y[i] = dataList.value[i].data5
+            windDirection_y[i] = dataList.value[i].data6
+            windSpeed_y[i] = dataList.value[i].data7
+            pm10_y[i] = dataList.value[i].data8
+            pressure_y[i] = dataList.value[i].data9
         }
         echart()
         equipOptions.value = res.data.data.equipListAll.map((item) => {
@@ -445,8 +455,8 @@ const loadData = async (pageNum = 0, id) => {
         })
         dataOptions.value = res.data.data.phyList.map((item) => {
             return {
-                label: item.chinese_name,
-                value: item.physicalName,
+                label: item.dataName,
+                value: item.node_id + " " + item.data_id,
             }
         })
     } else {
@@ -463,6 +473,83 @@ const closeModal = () => {
 function ChangeRoute(dir) {
     router.push(dir)
 
+}
+const tableHead = reactive({
+    data1: "data1",
+    data2: "data2",
+    data3: "data3",
+    data4: "data4",
+    data5: "data5",
+    data6: "data6",
+    data7: "data7",
+    data8: "data8",
+    data9: "data9",
+})
+
+const changeNode = async (id) => {
+    console.log("changeNode")
+    console.log("id:", id)
+    if (id == null)
+        return;
+    let res = await axios.get(`/phy/node/${id}`)
+    if (res.data.code == 200) {
+        console.log("Node res:", res)
+        let pp = res.data.data.phy
+        let count = res.data.data.count
+        for (let i = 0; i < count; i++) {
+            if (i == 0)
+                data1 = pp[i].dataName
+            else if (i == 1)
+                data2 = pp[i].dataName
+            else if (i == 2)
+                data3 = pp[i].dataName
+            else if (i == 3)
+                data4 = pp[i].dataName
+            else if (i == 4)
+                data5 = pp[i].dataName
+            else if (i == 5)
+                data6 = pp[i].dataName
+            else if (i == 6)
+                data7 = pp[i].dataName
+            else if (i == 7)
+                data8 = pp[i].dataName
+            else if (i == 8)
+                data9 = pp[i].dataName
+        }
+        loadDataforNode(0, user.id, pp)
+    }
+}
+
+// 用于动态加载某个node的dataName选项
+const loadDataforNode = async (pageNum = 0, id, phy) => {
+    if (pageNum != 0) {
+        pageInfo.pageNum = pageNum;
+    }
+    var nodeID = new Number(pageInfo.nodeID)
+    pageInfo.pageNum = 1
+    let res = await axios.post(`/data/${id}?dataName=${pageInfo.dataName}&nodeID=${nodeID}&time=${pageInfo.time}&pageNum=${pageInfo.pageNum}&pageSize=${pageInfo.pageSize}`)
+    if (res.data.code == 200) {
+        dataList.value = res.data.data.dataList
+        equipOptions.value = res.data.data.equipListAll.map((item) => {
+            return {
+                label: item.nodeName,
+                value: item.id,
+            }
+        })
+        console.log("修改dataOptions")
+        console.log("phy:", phy)
+        dataOptions.value = phy.map((item) => {
+            return {
+                label: item.dataName,
+                value: item.node_id + " " + item.data_id,
+            }
+        })
+    } else {
+        console.log(res.data.code)
+        message.error(res.data.msg)
+    }
+    pageInfo.count = res.data.data.count;
+    pageInfo.pageCount = parseInt(pageInfo.count / pageInfo.pageSize) + (pageInfo.count % pageInfo.pageSize > 0 ? 1 : 0)
 }
 
 const exportExcel = async () => {

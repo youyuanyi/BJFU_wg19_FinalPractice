@@ -77,7 +77,7 @@ function submit() {
 }
 
 const login = async () => {
-    //前端向后端/login接口发送submit的数据，然后同步阻塞等待后端验证的返回结果
+    //前端向后端/login接口发送submit的数据，然后阻塞等待后端验证的返回结果
     let res = await axios.post("/login", {
         userName: user.userName,
         password: user.password

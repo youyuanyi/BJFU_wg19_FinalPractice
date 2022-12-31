@@ -293,6 +293,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <n-modal v-model:show="showUpdateModel" preset="dialog" title="Dialog">
                                     <template #header>
                                         <div>修改</div>
@@ -342,12 +343,12 @@
 
 <script setup>
 import TopBar from '../components/TopBar.vue'
-import { ref, reactive, inject, onMounted, computed, provide, onBeforeMount } from 'vue'
+import { ref, reactive, inject, onMounted, watch, } from 'vue'
 import { Search } from '@vicons/ionicons5'
 import InjectToken from '../components/InjectToken.vue'
 import { AddCircleOutline, RefreshCircleOutline, SearchOutline, TrashOutline, CreateOutline, DownloadOutline } from "@vicons/ionicons5"
 import { useRouter, useRoute } from 'vue-router'
-import { eq } from 'lodash'
+import { create, eq } from 'lodash'
 const router = useRouter()
 const route = useRoute()
 
@@ -422,6 +423,9 @@ onMounted(() => {
     loadAllNodes()
 })
 
+
+
+
 const AllNodeList = ref([])
 const loadAllNodes = async () => {
     let res = await axios.get("/node")
@@ -448,8 +452,18 @@ const loadUserInfo = async () => {
     loadNodeInfo(user.id)
 }
 
+function sleep(time) {
+    return new Promise((resolve) => setTimeout(resolve, time));
+}
 const nodeList = ref([])
-
+watch(nodeList, (newValue, oldValue) => {
+    console.log(newValue, oldValue)
+    if (newValue != oldValue) {
+        sleep(9000).then(() => {
+            loadUserInfo()
+        })
+    }
+})
 const loadNodeInfo = async (id) => {
     console.log("user.id:", id)
     let res = await axios.get("node/" + id)  // 获取用户列表，以及所有的设备
@@ -494,6 +508,7 @@ const upNode = reactive({
     state: "",
     duration: 5,
 })
+
 const showUpdateModel = ref(false)
 const updateNode = async (node) => {
     showUpdateModel.value = true
@@ -557,6 +572,7 @@ const changeSystemTime = async () => {
     console.log("res:", res)
     if (res.data.code == 200) {
         message.success(res.data.msg)
+        console.log("修改系统时间成功")
         loadUserInfo()
         loadAllNodes()
     } else {

@@ -11,7 +11,6 @@ let routes = [
     { path: "/DataManage", component: () => import("../views/DataManage.vue") },
     { path: "/BarManage", component: () => import("../views/BarManage.vue") },
     { path: "/LineManage", component: () => import("../views/LineManage.vue") },
-    { path: "/test",component: () => import("../views/test.vue")}
 ]
 
 

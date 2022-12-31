@@ -208,13 +208,13 @@
                                             <n-table :bordered="true" :single-line="false" style="margin-top:20px;">
                                                 <thead>
                                                     <tr>
-
-                                                        <th class="hidden-480">物理量编号</th>
-                                                        <th class="hidden-480">物理量名</th>
-                                                        <th>中文名</th>
+                                                        <th>编号</th>
+                                                        <th>设备ID</th>
+                                                        <th>数据ID</th>
+                                                        <th>数据名</th>
                                                         <th>物理意义</th>
                                                         <th>换算方式</th>
-                                                        <th v-if="(user.role == 0)">操作</th>
+                                                        <th>操作</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -224,13 +224,14 @@
                                                         <td>
                                                             {{ phy.id }}
                                                         </td>
-                                                        <td class="hidden-480">{{ phy.physicalName }}</td>
-                                                        <td>{{ phy.chinese_name }}</td>
-                                                        <td class="hidden-480">
-                                                            {{ phy.meaning }}
+                                                        <td>{{ phy.node_id }}</td>
+                                                        <td>{{ phy.data_id }}</td>
+                                                        <td>{{ phy.dataName }}</td>
+                                                        <td>
+                                                            {{ phy.dataMeaning }}
                                                         </td>
                                                         <td>{{ phy.conversion }}</td>
-                                                        <td v-if="(user.role == 0)">
+                                                        <td>
                                                             <n-space>
                                                                 <n-button @click="updatePhy(phy)" type="primary">
                                                                     <template #icon><n-icon>
@@ -248,6 +249,8 @@
                                             </n-table>
                                             <br />
                                         </div>
+                                        <n-pagination @update:page="loadUserInfo" v-model:page="pageInfo.pageNum"
+                                            :page-count="pageInfo.pageCount" style="margin-top: 20px;" />
                                     </div>
                                 </div>
                                 <n-modal v-model:show="showUpdateModel" preset="dialog" title="Dialog">
@@ -255,19 +258,26 @@
                                         <div>修改</div>
                                     </template>
                                     <n-form ref="formRef" :model="upPhy">
-                                        <n-form-item label="物理量编号" style="margin-top: 20px;">
+                                        <n-form-item label="编号" style="margin-top: 20px;">
                                             <n-input v-model:value="upPhy.id" :disabled="!active" />
                                         </n-form-item>
-                                        <n-form-item label="物理量名">
-                                            <n-input v-model:value="upPhy.physicalName" placeholder="物理量名" clearable
+                                        <n-form-item label="设备编号">
+                                            <n-input v-model:value="upPhy.node_id" placeholder="设备编号" clearable
                                                 :disabled="!active" />
                                         </n-form-item>
-                                        <n-form-item label="物理意义">
-                                            <n-input type="textarea" v-model:value="upPhy.meaning" size="large" round
-                                                placeholder="物理意义" />
+                                        <n-form-item label="数据编号">
+                                            <n-input v-model:value="upPhy.data_id" placeholder="数据编号" clearable
+                                                :disabled="!active" />
                                         </n-form-item>
-                                        <n-form-item label="换算方式" path="duration">
-                                            <n-input v-model:value="upPhy.conversion" size="large" round
+                                        <n-form-item label="数据名">
+                                            <n-input v-model:value="upPhy.dataName" placeholder="数据名" clearable />
+                                        </n-form-item>
+                                        <n-form-item label="物理意义">
+                                            <n-input type="textarea" v-model:value="upPhy.dataMeaning" size="large"
+                                                round placeholder="物理意义" />
+                                        </n-form-item>
+                                        <n-form-item label="换算方式">
+                                            <n-input type="textarea" v-model:value="upPhy.conversion" size="large" round
                                                 placeholder="换算方式" />
                                         </n-form-item>
 
@@ -332,22 +342,19 @@ const formRef = ref(null)
 const bodyStyle = {
     width: "650px"
 }
-
+const pageInfo = reactive({
+    pageNum: 1,
+    pageSize: 9,
+    pageCount: 0,
+    count: 0,
+})
 
 // 页面加载时就执行
 onMounted(() => {
     loadUserInfo()
-    loadAllPhy()
 })
 
 const phyList = ref([])
-const loadAllPhy = async () => {
-    let res = await axios.get("/phy")
-    if (res.data.code == 200) {
-        phyList.value = res.data.data.phyList
-    }
-}
-
 const loadUserInfo = async () => {
     let res = await axios.get("/user")
     console.log(res)
@@ -356,19 +363,34 @@ const loadUserInfo = async () => {
         user.role = res.data.data.role
         user.name = res.data.data.name
     }
+    loadAllPhy()
 }
+const loadAllPhy = async () => {
+    let res = await axios.post(`/phy/${user.id}?pageNum=${pageInfo.pageNum}&pageSize=${pageInfo.pageSize}`)
+    if (res.data.code == 200) {
+        phyList.value = res.data.data.phyList
+    }
+    pageInfo.count = res.data.data.count;
+    pageInfo.pageCount = parseInt(pageInfo.count / pageInfo.pageSize) + (pageInfo.count % pageInfo.pageSize > 0 ? 1 : 0)
+}
+
+
 const upPhy = reactive({
     id: "",
-    physicalName: "",
-    meaning: "",
+    node_id: "",
+    data_id: "",
+    dataName: "",
+    dataMeaning: "",
     conversion: "",
 })
 
 const updatePhy = async (phy) => {
     showUpdateModel.value = true
     upPhy.id = phy.id
-    upPhy.physicalName = phy.physicalName
-    upPhy.meaning = phy.meaning
+    upPhy.node_id = phy.node_id
+    upPhy.data_id = phy.data_id
+    upPhy.dataName = phy.dataName
+    upPhy.dataMeaning = phy.dataMeaning
     upPhy.conversion = phy.conversion
 }
 const toUpdate = async () => {
@@ -382,14 +404,15 @@ const toUpdate = async () => {
 }
 const update = async () => {
     let res = await axios.put("phy/" + upPhy.id, {
-        physicalName: upPhy.physicalName,
-        meaning: upPhy.meaning,
+        node_id: upPhy.node_id,
+        data_id: upPhy.data_id,
+        dataName: upPhy.dataName,
+        dataMeaning: upPhy.dataMeaning,
         conversion: upPhy.conversion,
     })
     console.log("res:", res)
     if (res.data.code == 200) {
         message.success(res.data.msg)
-        loadAllPhy()
         loadUserInfo()
         closeModal()
     } else {
@@ -419,7 +442,7 @@ const goback = () => {
     left: 0;
     right: 0;
     margin: auto;
-    height: 60px;
+
     background: white;
     box-shadow: 0px 1px 3px #D3D4D8;
     border-radius: 5px;

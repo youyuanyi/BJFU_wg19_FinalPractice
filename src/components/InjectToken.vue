@@ -45,30 +45,14 @@ const loadAvatar = async () => {
     }
 }
 
-const toMain = () => {
-    router.push("/")
-}
+
 
 const toLogin = () => {
     router.push("/login")
 }
 
-const toHome = () => {
-    router.push({
-        path: "/myself",
-        query: {
-            id: user.id
-        }
-    })
-}
 
-const toPublish = () => {
-    if (login.value == false) {
-        message.warning("请先登录")
-    } else {
-        router.push("/publish")
-    }
-}
+
 
 const handleSelect = (key) => {
     router.push("/" + String(key))

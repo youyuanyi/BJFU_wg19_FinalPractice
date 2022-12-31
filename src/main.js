@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import "./style.css";
 import App from "./App.vue";
 import naive from "naive-ui"; // 引入ui框架
+
 import { createDiscreteApi } from "naive-ui"; // 引入createDiscreteApi
 import { createPinia } from "pinia"; // 引入pinia
 import { router } from "./common/router"; // 引入路由
